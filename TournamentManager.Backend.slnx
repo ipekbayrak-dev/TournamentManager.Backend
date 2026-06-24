@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/Api/">
+    <Project Path="Api/TournamentManager.Api.csproj" />
+  </Folder>
+  <Folder Name="/Application/">
+    <Project Path="Application/TournamentManager.Application.csproj" />
+  </Folder>
+  <Folder Name="/Domain/">
+    <Project Path="Domain/TournamentManager.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure/TournamentManager.Infrastructure.csproj" />
+  </Folder>
+</Solution>
