@@ -5,9 +5,9 @@ using TournamentManager.Domain.Entities;
 
 namespace TournamentManager.Infrastructure.Persistence.Configurations
 {
-    public class MatchConfiguration : IEntityTypeConfiguration<Match>
+    public class MatchConfiguration : EntityBaseConfigurations<Match>
     {
-        public void Configure(EntityTypeBuilder<Match> builder)
+        protected override void ConfigureEntity(EntityTypeBuilder<Match> builder)
         {
             builder.HasOne(b => b.TeamDire)
                 .WithMany()

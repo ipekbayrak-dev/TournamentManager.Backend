@@ -4,9 +4,9 @@ using TournamentManager.Domain.Entities;
 
 namespace TournamentManager.Infrastructure.Persistence.Configurations
 {
-    public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
+    public class PaymentConfiguration : EntityBaseConfigurations<Payment>
     {
-        public void Configure(EntityTypeBuilder<Payment> builder)
+        protected override void ConfigureEntity(EntityTypeBuilder<Payment> builder)
         {
             builder.Property(b => b.Amount)
                 .HasPrecision(18, 2)

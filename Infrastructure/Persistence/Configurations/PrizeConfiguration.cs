@@ -4,9 +4,9 @@ using TournamentManager.Domain.Entities;
 
 namespace TournamentManager.Infrastructure.Persistence.Configurations
 {
-    public class PrizeConfiguration : IEntityTypeConfiguration<Prize>
+    public class PrizeConfiguration : EntityBaseConfigurations<Prize>
     {
-        public void Configure(EntityTypeBuilder<Prize> builder)
+        protected override void ConfigureEntity(EntityTypeBuilder<Prize> builder)
         {
             builder.Property(b => b.TotalPool)
                 .HasPrecision(18, 2)

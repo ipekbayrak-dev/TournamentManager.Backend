@@ -4,9 +4,9 @@ using TournamentManager.Domain.Entities;
 
 namespace TournamentManager.Infrastructure.Persistence.Configurations
 {
-    public class TournamentEntryConfiguration : IEntityTypeConfiguration<TournamentEntry>
+    public class TournamentEntryConfiguration : EntityBaseConfigurations<TournamentEntry>
     {
-        public void Configure(EntityTypeBuilder<TournamentEntry> builder)
+        protected override void ConfigureEntity(EntityTypeBuilder<TournamentEntry> builder)
         {
             builder.HasIndex(b => new { b.TeamId, b.TournamentId })
                 .IsUnique();

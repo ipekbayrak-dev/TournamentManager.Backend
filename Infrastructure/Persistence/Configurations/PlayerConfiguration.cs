@@ -4,9 +4,9 @@ using TournamentManager.Domain.Entities;
 
 namespace TournamentManager.Infrastructure.Persistence.Configurations
 {
-    public class PlayerConfiguration : IEntityTypeConfiguration<Player>
+    public class PlayerConfiguration : EntityBaseConfigurations<Player>
     {
-        public void Configure(EntityTypeBuilder<Player> builder)
+        protected override void ConfigureEntity(EntityTypeBuilder<Player> builder)
         {
             builder.Property(b => b.Handle)
                 .IsRequired()

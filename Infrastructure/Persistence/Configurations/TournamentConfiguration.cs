@@ -4,9 +4,9 @@ using TournamentManager.Domain.Entities;
 
 namespace TournamentManager.Infrastructure.Persistence.Configurations
 {
-    public class TournamentConfiguration : IEntityTypeConfiguration<Tournament>
+    public class TournamentConfiguration : EntityBaseConfigurations<Tournament>
     {
-        public void Configure(EntityTypeBuilder<Tournament> builder)
+        protected override void ConfigureEntity(EntityTypeBuilder<Tournament> builder)
         {
             builder.Property(b => b.Name)
                 .HasMaxLength(63)

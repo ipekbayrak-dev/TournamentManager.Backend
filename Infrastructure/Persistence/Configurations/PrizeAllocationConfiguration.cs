@@ -4,9 +4,9 @@ using TournamentManager.Domain.Entities;
 
 namespace TournamentManager.Infrastructure.Persistence.Configurations
 {
-    public class PrizeAllocationConfiguration : IEntityTypeConfiguration<PrizeAllocation>
+    public class PrizeAllocationConfiguration : EntityBaseConfigurations<PrizeAllocation>
     {
-        public void Configure(EntityTypeBuilder<PrizeAllocation> builder)
+        protected override void ConfigureEntity(EntityTypeBuilder<PrizeAllocation> builder)
         {
             builder.Property(b => b.Percentage)
                 .HasPrecision(5, 2)
