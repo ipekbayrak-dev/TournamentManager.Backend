@@ -30,7 +30,7 @@ namespace TournamentManager.Application.Interfaces.Repositories
             int index = 0,
             int size = 10,
             bool withDeleted = false,
-            bool enableTracking = false,
+            bool enabledTracking = false,
             CancellationToken ct = default)
             ;
         Task<T> AddAsync(T entity);
