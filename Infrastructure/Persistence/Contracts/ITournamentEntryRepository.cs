@@ -3,7 +3,7 @@ using TournamentManager.Domain.Entities;
 
 namespace TournamentManager.Infrastructure.Persistence.Contracts
 {
-    public interface ITournamentEntry : IRepository<TournamentEntry>
+    public interface ITournamentEntryRepository : IRepository<TournamentEntry>
     {
         
     }
