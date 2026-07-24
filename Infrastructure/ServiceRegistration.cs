@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TournamentManager.Infrastructure.Identity;
+using TournamentManager.Domain.Entities;
 using TournamentManager.Infrastructure.Persistence;
 using TournamentManager.Infrastructure.Persistence.Contracts;
 using TournamentManager.Infrastructure.Persistence.Repositories;

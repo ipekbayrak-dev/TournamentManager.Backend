@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity;
-using TournamentManager.Domain.Entities;
 
-namespace TournamentManager.Infrastructure.Identity
+namespace TournamentManager.Domain.Entities
 {
     public class ApplicationUser : IdentityUser
     {
