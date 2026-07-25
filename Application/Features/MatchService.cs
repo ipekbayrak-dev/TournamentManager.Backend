@@ -6,6 +6,9 @@ namespace TournamentManager.Application.Features
 {
     public class MatchService : IMatchService
     {
+        public MatchService()
+        {
+        }
         public Task<Result<MatchResponse>> CreateAsync(CreateMatchRequest createMatchRequest, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();

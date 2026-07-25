@@ -10,5 +10,7 @@ namespace TournamentManager.Application.Dtos.Match
         public Guid? TeamRadiantId { get; set; }
         public Guid? TeamDireId { get; set; }
         public DateTime ScheduledAt { get; set; }
+        public Guid? WinnerAdvancesToMatchId { get; set; }
+        public Guid? LoserAdvancesToMatchId { get; set; }
     }
 }

@@ -21,10 +21,15 @@ namespace TournamentManager.Application.Features
         }
         public Task<Result<TokenResponse>> RefreshAsync(TokenResponse tokenResponse, CancellationToken cancellationToken = default)
         {
-            var principal = _tokenService.GetPrincipalFromExpiredToken(tokenResponse.AccessToken);
-
-            if (principal is null)
+            ClaimsPrincipal principal;
+            try
+            {
+                principal = _tokenService.GetPrincipalFromExpiredToken(tokenResponse.AccessToken);
+            }
+            catch
+            {
                 return Task.FromResult(Result<TokenResponse>.Failure("Invalid token"));
+            }
 
             var newAccessToken = _tokenService.GenerateToken(principal.Claims);
             var newRefreshToken = _tokenService.GenerateRefreshToken();

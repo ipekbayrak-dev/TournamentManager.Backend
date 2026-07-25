@@ -15,12 +15,10 @@ namespace TournamentManager.Infrastructure.Persistence.Configurations
                 .IsRequired(false);
             builder.Property(x => x.DeletedAt)
                 .IsRequired(false);
-            builder.Property(x => x.IsActive)
-                .IsRequired();
-            builder.HasQueryFilter(x => x.IsActive);
+            builder.Ignore(x => x.IsActive);
+            builder.HasQueryFilter(x => x.DeletedAt == null);
             builder.HasIndex(x => x.CreatedAt);
-            builder.HasIndex(x => x.IsActive)
-                .HasFilter("[IsActive] = 1");
+            builder.HasIndex(x => x.DeletedAt);
             ConfigureEntity(builder);
         }
         protected abstract void ConfigureEntity(EntityTypeBuilder<T> builder);

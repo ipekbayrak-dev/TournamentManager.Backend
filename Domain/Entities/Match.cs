@@ -8,7 +8,7 @@ namespace TournamentManager.Domain.Entities
         public BracketType BracketType { get; set; }
         public int RoundNumber { get; set; }
         public Guid TournamentId { get; set; }
-        public required Tournament Tournament { get; set; }
+        public Tournament? Tournament { get; set; }
         public Guid? TeamRadiantId { get; set; }
         public Team? TeamRadiant { get; set; }
         public Guid? TeamDireId { get; set; }

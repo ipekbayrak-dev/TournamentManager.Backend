@@ -1,6 +1,6 @@
 using TournamentManager.Domain.Entities;
 using TournamentManager.Infrastructure.Persistence.Common;
-using TournamentManager.Infrastructure.Persistence.Contracts;
+using TournamentManager.Application.Interfaces.Repositories;
 
 namespace TournamentManager.Infrastructure.Persistence.Repositories
 {

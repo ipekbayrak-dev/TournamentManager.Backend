@@ -4,6 +4,7 @@ namespace TournamentManager.Application.Dtos.Player
 {
     public class UpdatePlayerRequest
     {
+        public Guid Id { get; set; }
         public required string Handle { get; set; }
         public required string FirstName { get; set; }
         public required string LastName { get; set; }

@@ -4,6 +4,7 @@ namespace TournamentManager.Application.Dtos.Match
 {
     public class UpdateMatchRequest
     {
+        public Guid Id { get; set; }
         public int TeamRadiantScore { get; set; }
         public int TeamDireScore { get; set; }
         public MatchStatus Status { get; set; }

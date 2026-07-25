@@ -6,10 +6,10 @@ namespace TournamentManager.Domain.Entities;
 public class TournamentEntry : BaseEntity 
 {
     public Guid TournamentId { get; set; }
-    public required Tournament Tournament { get; set; }
+    public Tournament? Tournament { get; set; }
     public Guid TeamId { get; set; }
-    public required Team Team { get; set; }
-    public DateTime RegisteredAt { get; set; } = DateTime.UtcNow;
+    public Team? Team { get; set; }
+    public DateTime RegisteredAt { get; set; }
     public int? Seed { get; set; }
     public EntryStatus Status { get; set; } = EntryStatus.Pending;
     public Payment? Payment { get; set; }

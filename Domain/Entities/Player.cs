@@ -13,7 +13,7 @@ namespace TournamentManager.Domain.Entities
         public bool IsCaptain { get; set; }
         public string? SteamId { get; set; }
         public Guid TeamId { get; set; }
-        public required Team Team { get; set; }
+        public Team? Team { get; set; }
 
     }
 }

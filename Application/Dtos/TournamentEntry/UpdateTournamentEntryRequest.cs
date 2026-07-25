@@ -4,6 +4,7 @@ namespace TournamentManager.Application.Dtos.TournamentEntry
 {
     public class UpdateTournamentEntryRequest
     {
+        public Guid Id { get; set; }
         public int? Seed { get; set; }
         public EntryStatus Status { get; set; }
     }

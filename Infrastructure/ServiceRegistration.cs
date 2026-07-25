@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TournamentManager.Domain.Entities;
 using TournamentManager.Infrastructure.Persistence;
-using TournamentManager.Infrastructure.Persistence.Contracts;
+using TournamentManager.Application.Interfaces.Repositories;
 using TournamentManager.Infrastructure.Persistence.Repositories;
 
 namespace TournamentManager.Infrastructure
