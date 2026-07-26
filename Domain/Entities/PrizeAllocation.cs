@@ -8,7 +8,7 @@ public class PrizeAllocation : BaseEntity
     public Prize? Prize { get; set; }
     public int Placement { get; set; } 
     public decimal Percentage { get; set; } 
-    public decimal CalculatedPayoutAmount => (Prize.TotalPool * Percentage) / 100;
+    public decimal CalculatedPayoutAmount => Prize?.TotalPool * Percentage / 100 ?? 0m;
     public Guid? WinningTeamId { get; set; }
     public Team? WinningTeam { get; set; }
 }
