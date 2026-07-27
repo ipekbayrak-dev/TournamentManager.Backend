@@ -90,7 +90,7 @@ namespace TournamentManager.Application.Features
             
             if (team is null)
             {
-                return Result<TeamResponse>.Failure("Invalid Id");
+                return Result<TeamResponse>.Success(null);
             }
 
             return Result<TeamResponse>.Success(MapToResponse(team));

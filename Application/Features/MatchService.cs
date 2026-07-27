@@ -98,7 +98,7 @@ namespace TournamentManager.Application.Features
 
             if (match is null)
             {
-                return Result<MatchResponse>.Failure("Match not found.");
+                return Result<MatchResponse>.Success(null);
             }
 
             var response = MapToResponse(match);

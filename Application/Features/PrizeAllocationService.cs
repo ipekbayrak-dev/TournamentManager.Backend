@@ -72,7 +72,7 @@ namespace TournamentManager.Application.Features
 
             if (prizeAllocation is null)
             {
-                return Result<PrizeAllocationResponse>.Failure("Invalid Id");
+                return Result<PrizeAllocationResponse>.Success(null);
             }
 
             return Result<PrizeAllocationResponse>.Success(MapToResponse(prizeAllocation));

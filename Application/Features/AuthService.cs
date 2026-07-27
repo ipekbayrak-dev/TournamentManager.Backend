@@ -80,11 +80,13 @@ namespace TournamentManager.Application.Features
 
             var accessToken = _tokenService.GenerateToken(claims);
             var refreshToken = _tokenService.GenerateRefreshToken();
+            var expiryTime = new JwtSecurityTokenHandler().ReadJwtToken(accessToken).ValidTo;
 
             return Result<TokenResponse>.Success(new TokenResponse
             {
                 AccessToken = accessToken,
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken,
+                ExpiryTime = expiryTime
             });
         }
 

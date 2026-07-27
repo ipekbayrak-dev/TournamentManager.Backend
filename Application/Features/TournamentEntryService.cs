@@ -75,7 +75,7 @@ namespace TournamentManager.Application.Features
             
             if (tournamentEntry is null)
             {
-                return Result<TournamentEntryResponse>.Failure("Invalid Id");
+                return Result<TournamentEntryResponse>.Success(null);
             }
 
             return Result<TournamentEntryResponse>.Success(MapToResponse(tournamentEntry));

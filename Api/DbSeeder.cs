@@ -27,7 +27,7 @@ namespace TournamentManager.Api
                 }
 
                 // Seed default admin user
-                if (!userManager.Users.Any())
+                if (await userManager.FindByEmailAsync("hello@ipekbayrak.dev") is null)
                 {
                     var admin = new ApplicationUser
                     {

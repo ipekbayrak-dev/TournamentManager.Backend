@@ -80,7 +80,7 @@ namespace TournamentManager.Application.Features
             
             if (payment is null)
             {
-                return Result<PaymentResponse>.Failure("Invalid Id");
+                return Result<PaymentResponse>.Success(null);
             }
 
             return Result<PaymentResponse>.Success(MapToResponse(payment));

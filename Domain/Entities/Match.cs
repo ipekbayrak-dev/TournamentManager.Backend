@@ -19,6 +19,7 @@ namespace TournamentManager.Domain.Entities
         public DateTime ScheduledAt { get; set; }
         public DateTime? CompletedAt { get; set; }
         public Guid? WinnerTeamId { get; set; }
+        public Team? WinnerTeam { get; set; }
         public Guid? WinnerAdvancesToMatchId { get; set; }
         public Match? WinnerAdvancesToMatch { get; set; }
         public Guid? LoserAdvancesToMatchId { get; set; }

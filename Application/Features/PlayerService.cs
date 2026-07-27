@@ -81,7 +81,7 @@ namespace TournamentManager.Application.Features
 
             if (player is null)
             {
-                return Result<PlayerResponse>.Failure("Invalid Id");
+                return Result<PlayerResponse>.Success(null);
             }
 
             return Result<PlayerResponse>.Success(MapToResponse(player));
@@ -103,7 +103,7 @@ namespace TournamentManager.Application.Features
             player.Position = updatePlayerRequest.Position;
             player.IsCaptain = updatePlayerRequest.IsCaptain;
             player.SteamId = updatePlayerRequest.SteamId;
-            player.TeamId = updatePlayerRequest.TeamId;
+
 
             await _playerRepository.UpdateAsync(player);
 

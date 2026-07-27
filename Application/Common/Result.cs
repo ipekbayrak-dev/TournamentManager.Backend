@@ -11,7 +11,7 @@ namespace TournamentManager.Application.Common
             this.Data = data;
             this.ErrorMessage = errorMessage;
         }
-        public static Result<T> Success(T data) => new(true, data,string.Empty);
+        public static Result<T> Success(T? data) => new(true, data, string.Empty);
         public static Result<T> Failure(string errorMessage) => new(false, default, errorMessage);
     }
 

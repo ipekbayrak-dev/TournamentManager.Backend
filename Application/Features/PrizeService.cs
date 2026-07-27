@@ -47,7 +47,6 @@ namespace TournamentManager.Application.Features
                 TournamentId = createPrizeRequest.TournamentId,
                 Allocations = createPrizeRequest.Allocations.Select(x => new PrizeAllocation
                 {
-                    PrizeId = x.PrizeId,
                     Placement = x.Placement,
                     Percentage = x.Percentage
                 }).ToList()
@@ -78,7 +77,7 @@ namespace TournamentManager.Application.Features
 
             if (prize is null)
             {
-                return Result<PrizeResponse>.Failure("Prize not found.");
+                return Result<PrizeResponse>.Success(null);
             }
 
             return Result<PrizeResponse>.Success(MapToResponse(prize));
@@ -90,7 +89,7 @@ namespace TournamentManager.Application.Features
 
             if (prize is null)
             {
-                return Result<PrizeResponse>.Failure("Invalid Id");
+                return Result<PrizeResponse>.Success(null);
             }
 
             return Result<PrizeResponse>.Success(MapToResponse(prize));

@@ -16,7 +16,7 @@ namespace TournamentManager.Infrastructure.Persistence.Common
             _appDbContext = appDbContext;
         }
 
-        public async Task<T?> GetAsync(Expression<Func<T, bool>> predicate, bool withDeleted = false, bool enabledTracking = false, CancellationToken cancellationToken = default)
+        public virtual async Task<T?> GetAsync(Expression<Func<T, bool>> predicate, bool withDeleted = false, bool enabledTracking = false, CancellationToken cancellationToken = default)
         {
             IQueryable<T> query = Table;
             if (!enabledTracking)
@@ -27,7 +27,7 @@ namespace TournamentManager.Infrastructure.Persistence.Common
             return await query.FirstOrDefaultAsync(predicate, cancellationToken);
         }
 
-        public async Task<ICollection<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, bool withDeleted = false, bool enabledTracking = false, CancellationToken cancellationToken = default)
+        public virtual async Task<ICollection<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, bool withDeleted = false, bool enabledTracking = false, CancellationToken cancellationToken = default)
         {
             IQueryable<T> query = Table;
             if (!enabledTracking)

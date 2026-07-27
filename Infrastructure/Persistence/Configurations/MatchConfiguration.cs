@@ -17,6 +17,10 @@ namespace TournamentManager.Infrastructure.Persistence.Configurations
                 .WithMany()
                 .HasForeignKey(b => b.TeamRadiantId)
                 .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(b => b.WinnerTeam)
+                .WithMany()
+                .HasForeignKey(b => b.WinnerTeamId)
+                .OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(b => b.LoserAdvancesToMatch)
                 .WithMany()
                 .HasForeignKey(b => b.LoserAdvancesToMatchId)
