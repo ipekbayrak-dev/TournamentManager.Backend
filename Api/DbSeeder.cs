@@ -39,7 +39,7 @@ namespace TournamentManager.Api
                         EmailConfirmed = true
                     };
 
-                    var result = await userManager.CreateAsync(admin, "Kusursuzipek0$");
+                    var result = await userManager.CreateAsync(admin, "Admin1234$");
                     if (result.Succeeded)
                         await userManager.AddToRoleAsync(admin, Roles.Admin);
                     else

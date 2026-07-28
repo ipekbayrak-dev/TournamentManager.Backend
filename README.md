@@ -118,7 +118,7 @@ The default admin account (`hello@ipekbayrak.dev`) and all roles are seeded auto
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | hello@ipekbayrak.dev | Kusursuzipek0$ |
+| Admin | hello@ipekbayrak.dev | Admin1234$ |
 
 ## License
 
