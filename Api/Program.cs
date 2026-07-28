@@ -1,9 +1,11 @@
 using System.Text;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using TournamentManager.Api;
 using TournamentManager.Application;
+using TournamentManager.Application.Validators;
 using TournamentManager.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +46,7 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
+builder.Services.AddValidatorsFromAssemblyContaining<SignUpRequestValidator>();
 builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();

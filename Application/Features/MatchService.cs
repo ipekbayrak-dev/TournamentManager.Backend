@@ -36,7 +36,7 @@ namespace TournamentManager.Application.Features
         }
         public async Task<Result<MatchResponse>> CreateAsync(CreateMatchRequest createMatchRequest, CancellationToken cancellationToken = default)
         {
-            var match = new Match()
+            var match = new Match
             {
                 BracketType = createMatchRequest.BracketType,
                 RoundNumber = createMatchRequest.RoundNumber,

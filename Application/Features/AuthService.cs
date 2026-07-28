@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using TournamentManager.Application.Common;
 using TournamentManager.Application.Dtos.Auth;
@@ -13,11 +14,15 @@ namespace TournamentManager.Application.Features
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenService _tokenService;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public AuthService(UserManager<ApplicationUser> userManager, ITokenService tokenService, RoleManager<IdentityRole> roleManager)
+        private readonly IValidator<SignUpRequest> _signUpRequestValidator;
+        private readonly IValidator<SignInRequest> _signInRequestValidator;
+        public AuthService(UserManager<ApplicationUser> userManager, ITokenService tokenService, RoleManager<IdentityRole> roleManager, IValidator<SignUpRequest> signUpRequestValidator, IValidator<SignInRequest> signInRequestValidator)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _roleManager = roleManager;
+            _signUpRequestValidator = signUpRequestValidator;
+            _signInRequestValidator = signInRequestValidator;
         }
         public Task<Result<TokenResponse>> RefreshAsync(TokenResponse tokenResponse, CancellationToken cancellationToken = default)
         {
@@ -49,6 +54,10 @@ namespace TournamentManager.Application.Features
 
         public async Task<Result<TokenResponse>> SignInAsync(SignInRequest signInRequest, CancellationToken cancellationToken = default)
         {
+            var validation = await _signInRequestValidator.ValidateAsync(signInRequest, cancellationToken);
+            if (!validation.IsValid)
+                return Result<TokenResponse>.Failure(validation.ToErrorMessage());
+
             var user = await _userManager.FindByEmailAsync(signInRequest.Email);
             if (user is null)
             {
@@ -73,10 +82,7 @@ namespace TournamentManager.Application.Features
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
 
             var accessToken = _tokenService.GenerateToken(claims);
             var refreshToken = _tokenService.GenerateRefreshToken();
@@ -92,6 +98,11 @@ namespace TournamentManager.Application.Features
 
         public async Task<Result> SignUpAsync(SignUpRequest signUpRequest, CancellationToken cancellationToken = default)
         {
+            var validation = await _signUpRequestValidator.ValidateAsync(signUpRequest, cancellationToken);
+            
+            if (!validation.IsValid)
+                return Result.Failure(validation.ToErrorMessage());
+
             if (await _userManager.FindByEmailAsync(signUpRequest.Email) is not null)
             {
                 return Result.Failure("Email already in use");

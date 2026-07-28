@@ -29,7 +29,7 @@ namespace TournamentManager.Application.Features
                     Placement = x.Placement,
                     Percentage = x.Percentage,
                     WinningTeamId = x.WinningTeamId
-                }).ToList() ?? new List<PrizeAllocationResponse>()
+                }).ToList() ?? []
             };
         }
 

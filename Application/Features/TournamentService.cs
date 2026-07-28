@@ -1,3 +1,4 @@
+using FluentValidation;
 using TournamentManager.Application.Common;
 using TournamentManager.Application.Dtos.Match;
 using TournamentManager.Application.Dtos.Tournament;
@@ -12,11 +13,12 @@ namespace TournamentManager.Application.Features
     public class TournamentService : ITournamentService
     {
         private readonly ITournamentRepository _tournamentRepository;
-        public TournamentService(ITournamentRepository tournamentRepository)
+        private readonly IValidator<CreateTournamentRequest> _createValidator;
+        public TournamentService(ITournamentRepository tournamentRepository, IValidator<CreateTournamentRequest> createValidator)
         {
             _tournamentRepository = tournamentRepository;
+            _createValidator = createValidator;
         }
-        // TODO: GetByIdAsync and GetAllAsync need .Include(Matches).Include(Entries) — add eager loading to ITournamentRepository
         private static TournamentResponse MapToResponse(Tournament tournament)
         {
             return new TournamentResponse
@@ -59,10 +61,10 @@ namespace TournamentManager.Application.Features
         }
         public async Task<Result<TournamentResponse>> CreateAsync(CreateTournamentRequest createTournamentRequest, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(createTournamentRequest.Name))
-            {
-                return Result<TournamentResponse>.Failure("Invalid tournament name.");
-            }
+            var validation = await _createValidator.ValidateAsync(createTournamentRequest, cancellationToken);
+
+            if (!validation.IsValid)
+                return Result<TournamentResponse>.Failure(validation.ToErrorMessage());
 
             var tournament = new Tournament
             {
@@ -104,7 +106,7 @@ namespace TournamentManager.Application.Features
         public async Task<Result<TournamentResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var tournament = await _tournamentRepository.GetAsync(x => x.Id == id, cancellationToken: cancellationToken);
-            
+
             if (tournament is null)
             {
                 return Result<TournamentResponse>.Success(null);

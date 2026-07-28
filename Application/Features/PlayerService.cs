@@ -1,3 +1,4 @@
+using FluentValidation;
 using TournamentManager.Application.Common;
 using TournamentManager.Application.Dtos.Player;
 using TournamentManager.Application.Interfaces.Repositories;
@@ -9,9 +10,11 @@ namespace TournamentManager.Application.Features
     public class PlayerService : IPlayerService
     {
         private readonly IPlayerRepository _playerRepository;
-        public PlayerService(IPlayerRepository playerRepository)
+        private readonly IValidator<CreatePlayerRequest> _createValidator;
+        public PlayerService(IPlayerRepository playerRepository, IValidator<CreatePlayerRequest> createValidator)
         {
             _playerRepository = playerRepository;
+            _createValidator = createValidator;
         }
         private static PlayerResponse MapToResponse(Player player)
         {
@@ -30,10 +33,10 @@ namespace TournamentManager.Application.Features
         }
         public async Task<Result<PlayerResponse>> CreateAsync(CreatePlayerRequest createPlayerRequest, CancellationToken cancellationToken = default)
         {
-            if (createPlayerRequest.TeamId == Guid.Empty)
-            {
-                return Result<PlayerResponse>.Failure("Invalid team entry ID.");
-            }
+            var validation = await _createValidator.ValidateAsync(createPlayerRequest, cancellationToken);
+
+            if (!validation.IsValid)
+                return Result<PlayerResponse>.Failure(validation.ToErrorMessage());
 
             var player = new Player
             {
@@ -103,7 +106,6 @@ namespace TournamentManager.Application.Features
             player.Position = updatePlayerRequest.Position;
             player.IsCaptain = updatePlayerRequest.IsCaptain;
             player.SteamId = updatePlayerRequest.SteamId;
-
 
             await _playerRepository.UpdateAsync(player);
 

@@ -16,14 +16,12 @@ namespace TournamentManager.Api
             {
                 // Seed roles
                 string[] roles = [Roles.Admin, Roles.Captain, Roles.Player];
-                foreach (var role in roles)
+                var existingRoles = await roleManager.Roles.Select(r => r.Name).ToListAsync();
+                foreach (var role in roles.Where(r => !existingRoles.Contains(r)))
                 {
-                    if (!await roleManager.RoleExistsAsync(role))
-                    {
-                        var result = await roleManager.CreateAsync(new IdentityRole(role));
-                        if (!result.Succeeded)
-                            Console.WriteLine($"Failed to create role {role}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-                    }
+                    var result = await roleManager.CreateAsync(new IdentityRole(role));
+                    if (!result.Succeeded)
+                        Console.WriteLine($"Failed to create role {role}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
                 }
 
                 // Seed default admin user
