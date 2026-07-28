@@ -14,7 +14,7 @@ namespace TournamentManager.Infrastructure.Persistence.Configurations
             builder.Property(b => b.Description)
                 .HasMaxLength(255);
             builder.Property(b => b.Location)
-                .HasMaxLength(15);
+                .HasMaxLength(100);
             builder.HasMany(b => b.Matches)
                 .WithOne(b => b.Tournament)
                 .HasForeignKey(b => b.TournamentId);
