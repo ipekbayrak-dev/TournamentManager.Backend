@@ -65,7 +65,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.MapGet("/", () => Results.Content("""
+var frontendUrl = app.Configuration["FrontendSettings:BaseUrl"]!;
+
+app.MapGet("/", () =>
+{
+    var html = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -107,36 +111,21 @@ app.MapGet("/", () => Results.Content("""
       text-align: center;
     }
     .icon { font-size: 3.5rem; margin-bottom: 1rem; }
-    h1 {
-      font-size: 1.75rem;
-      font-weight: 800;
-      margin-bottom: 0.5rem;
-    }
+    h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; }
     h1 span {
       background: linear-gradient(135deg, var(--gold), var(--gold-light));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .subtitle {
-      color: var(--muted);
-      font-size: 0.95rem;
-      margin-bottom: 2rem;
-      line-height: 1.6;
-    }
+    .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.6; }
     .divider {
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--gold), transparent);
       opacity: 0.4;
       margin: 1.75rem 0;
     }
-    .badge-row {
-      display: flex;
-      justify-content: center;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      margin-bottom: 2rem;
-    }
+    .badge-row { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem; }
     .badge {
       background: var(--surface-2);
       border: 1px solid var(--purple-dark);
@@ -145,23 +134,33 @@ app.MapGet("/", () => Results.Content("""
       padding: 0.3rem 0.75rem;
       border-radius: 999px;
     }
+    .btn-row { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
     .btn {
       display: inline-block;
       background: linear-gradient(135deg, var(--purple), var(--purple-light));
       color: #fff;
       text-decoration: none;
       font-weight: 600;
-      padding: 0.75rem 2rem;
+      padding: 0.75rem 1.75rem;
       border-radius: 0.5rem;
       font-size: 0.95rem;
       transition: opacity 0.15s;
     }
     .btn:hover { opacity: 0.85; }
-    .footer {
-      margin-top: 2rem;
-      color: var(--muted);
-      font-size: 0.8rem;
+    .btn-outline {
+      display: inline-block;
+      background: transparent;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      text-decoration: none;
+      font-weight: 600;
+      padding: 0.75rem 1.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.95rem;
+      transition: background 0.15s, color 0.15s;
     }
+    .btn-outline:hover { background: var(--gold); color: var(--bg); }
+    .footer { margin-top: 2rem; color: var(--muted); font-size: 0.8rem; }
     .footer a { color: var(--gold); text-decoration: none; }
     .footer a:hover { text-decoration: underline; }
   </style>
@@ -182,14 +181,19 @@ app.MapGet("/", () => Results.Content("""
       <span class="badge">Double Elimination</span>
     </div>
     <div class="divider"></div>
-    <a href="/scalar/v1" class="btn">View API Docs →</a>
+    <div class="btn-row">
+      <a href="/scalar/v1" class="btn">View API Docs →</a>
+      <a href="__FRONTEND_URL__" class="btn-outline">Visit App →</a>
+    </div>
     <div class="footer">
       <p style="margin-top:1rem">Built by <a href="https://ipekbayrak.dev">İpek Bayrak</a></p>
     </div>
   </div>
 </body>
 </html>
-""", "text/html"));
+""".Replace("__FRONTEND_URL__", frontendUrl);
+    return Results.Content(html, "text/html");
+});
 
 
 app.Run();
