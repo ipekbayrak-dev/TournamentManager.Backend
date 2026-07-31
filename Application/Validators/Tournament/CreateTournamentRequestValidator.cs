@@ -1,7 +1,7 @@
 using FluentValidation;
 using TournamentManager.Application.Dtos.Tournament;
 
-namespace TournamentManager.Application.Validators
+namespace TournamentManager.Application.Validators.Tournament
 {
     public class CreateTournamentRequestValidator : AbstractValidator<CreateTournamentRequest>
     {

@@ -1,7 +1,7 @@
 using FluentValidation;
 using TournamentManager.Application.Dtos.Auth;
 
-namespace TournamentManager.Application.Validators
+namespace TournamentManager.Application.Validators.Auth
 {
     public class SignInRequestValidator : AbstractValidator<SignInRequest>
     {

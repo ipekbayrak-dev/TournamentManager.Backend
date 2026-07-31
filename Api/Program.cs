@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using TournamentManager.Api;
 using TournamentManager.Application;
-using TournamentManager.Application.Validators;
+using TournamentManager.Application.Validators.Auth;
 using TournamentManager.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
