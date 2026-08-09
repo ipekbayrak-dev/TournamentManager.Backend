@@ -30,6 +30,7 @@ namespace TournamentManager.Application.Features
                     FirstName = x.FirstName,
                     LastName = x.LastName,
                     CountryCode = x.CountryCode,
+                    Status = x.Status,
                     Position = x.Position,
                     IsCaptain = x.IsCaptain,
                     SteamId = x.SteamId,

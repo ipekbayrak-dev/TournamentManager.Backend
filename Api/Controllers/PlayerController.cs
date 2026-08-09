@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using TournamentManager.Application.Common;
 using TournamentManager.Application.Dtos.Player;
 using TournamentManager.Application.Interfaces.Services;
+using TournamentManager.Domain.Enums;
 
 namespace TournamentManager.Api.Controllers
 {
@@ -35,6 +36,32 @@ namespace TournamentManager.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error during GetAll for {TeamId}", teamId);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
+            }
+        }
+        [HttpGet("pending")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> GetPendingPlayerAsync()
+        {
+            try
+            {
+                var result = await _playerService.GetPendingPlayerAsync();
+
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(result.ErrorMessage);
+                }
+
+                return Ok(result.Data);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during GetPendingPlayerAsync");
                 return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
@@ -96,7 +123,7 @@ namespace TournamentManager.Api.Controllers
             try
             {
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                
+
                 if (userId is null)
                 {
                     return Unauthorized();
@@ -104,7 +131,7 @@ namespace TournamentManager.Api.Controllers
 
                 var result = await _playerService.CreateProfileAsync(createPlayerRequest, userId);
 
-                if(!result.IsSuccess)
+                if (!result.IsSuccess)
                 {
                     return BadRequest(result.ErrorMessage);
                 }
@@ -121,6 +148,26 @@ namespace TournamentManager.Api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
+        [HttpPut("profile")]
+        public async Task<IActionResult> ResubmitProfileAsync([FromBody] CreatePlayerRequest request)
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId is null) return Unauthorized();
+
+                var result = await _playerService.ResubmitProfileAsync(request, userId);
+                if (!result.IsSuccess) return BadRequest(result.ErrorMessage);
+
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during ResubmitProfile");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> CreateAsync([FromBody] CreatePlayerRequest createPlayerRequest)
@@ -171,6 +218,32 @@ namespace TournamentManager.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error during Update for {Id}", updatePlayerRequest.Id);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
+            }
+        }
+        [HttpPut("{id}/status")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> UpdatePlayerAsync(Guid id, [FromBody] PlayerStatus playerStatus)
+        {
+            try
+            {
+                var result = await _playerService.UpdatePlayerStatusAsync(id, playerStatus);
+
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(result.ErrorMessage);
+                }
+
+                return Ok();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during Update for {Id}", id);
                 return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }

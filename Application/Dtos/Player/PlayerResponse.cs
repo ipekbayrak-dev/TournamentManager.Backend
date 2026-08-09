@@ -9,6 +9,7 @@ namespace TournamentManager.Application.Dtos.Player
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
         public required string CountryCode { get; set; }
+        public required PlayerStatus Status { get; set; }
         public required DotaPosition Position { get; set; }
         public bool IsCaptain { get; set; }
         public string? SteamId { get; set; }

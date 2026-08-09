@@ -6,6 +6,7 @@ using TournamentManager.Application.Dtos.Player;
 using TournamentManager.Application.Interfaces.Repositories;
 using TournamentManager.Application.Interfaces.Services;
 using TournamentManager.Domain.Entities;
+using TournamentManager.Domain.Enums;
 
 namespace TournamentManager.Application.Features
 {
@@ -29,6 +30,7 @@ namespace TournamentManager.Application.Features
                 FirstName = player.FirstName,
                 LastName = player.LastName,
                 CountryCode = player.CountryCode,
+                Status = player.Status,
                 Position = player.Position,
                 IsCaptain = player.IsCaptain,
                 SteamId = player.SteamId,
@@ -48,6 +50,7 @@ namespace TournamentManager.Application.Features
                 FirstName = createPlayerRequest.FirstName,
                 LastName = createPlayerRequest.LastName,
                 CountryCode = createPlayerRequest.CountryCode,
+                Status = PlayerStatus.Approved,
                 Position = createPlayerRequest.Position,
                 IsCaptain = createPlayerRequest.IsCaptain,
                 SteamId = createPlayerRequest.SteamId,
@@ -76,6 +79,15 @@ namespace TournamentManager.Application.Features
         public async Task<Result<ICollection<PlayerResponse>>> GetAllByTeamIdAsync(Guid teamId, CancellationToken cancellationToken = default)
         {
             var player = await _playerRepository.GetAllAsync(x => x.TeamId == teamId, cancellationToken: cancellationToken);
+
+            var response = player.Select(MapToResponse).ToList();
+
+            return Result<ICollection<PlayerResponse>>.Success(response);
+        }
+
+        public async Task<Result<ICollection<PlayerResponse>>> GetPendingPlayerAsync(CancellationToken cancellationToken = default)
+        {
+            var player = await _playerRepository.GetAllAsync(x => x.Status == PlayerStatus.Pending, cancellationToken: cancellationToken);
 
             var response = player.Select(MapToResponse).ToList();
 
@@ -119,6 +131,7 @@ namespace TournamentManager.Application.Features
                 FirstName = createPlayerRequest.FirstName,
                 LastName = createPlayerRequest.LastName,
                 CountryCode = createPlayerRequest.CountryCode,
+                Status = PlayerStatus.Pending,
                 Position = createPlayerRequest.Position,
                 IsCaptain = createPlayerRequest.IsCaptain,
                 SteamId = createPlayerRequest.SteamId,
@@ -126,7 +139,7 @@ namespace TournamentManager.Application.Features
             };
 
             await _playerRepository.AddAsync(player);
-            
+
             user.PlayerId = player.Id;
             await _userManager.UpdateAsync(user);
 
@@ -142,6 +155,36 @@ namespace TournamentManager.Application.Features
             {
                 return Result<PlayerResponse>.Success(null);
             }
+
+            return Result<PlayerResponse>.Success(MapToResponse(player));
+        }
+
+        public async Task<Result<PlayerResponse>> ResubmitProfileAsync(CreatePlayerRequest request, string userId, CancellationToken cancellationToken = default)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null) return Result<PlayerResponse>.Failure("User not found");
+            if (user.PlayerId is null) return Result<PlayerResponse>.Failure("No player profile found");
+
+            var player = await _playerRepository.GetAsync(x => x.Id == user.PlayerId, cancellationToken: cancellationToken);
+            if (player is null) return Result<PlayerResponse>.Failure("Player not found");
+
+            if (player.Status != PlayerStatus.Rejected)
+                return Result<PlayerResponse>.Failure("Only rejected profiles can be resubmitted");
+
+            var validation = await _createValidator.ValidateAsync(request, cancellationToken);
+            if (!validation.IsValid) return Result<PlayerResponse>.Failure(validation.ToErrorMessage());
+
+            player.Handle = request.Handle;
+            player.FirstName = request.FirstName;
+            player.LastName = request.LastName;
+            player.CountryCode = request.CountryCode;
+            player.Position = request.Position;
+            player.IsCaptain = request.IsCaptain;
+            player.SteamId = request.SteamId;
+            player.TeamId = request.TeamId;
+            player.Status = PlayerStatus.Pending;
+
+            await _playerRepository.UpdateAsync(player);
 
             return Result<PlayerResponse>.Success(MapToResponse(player));
         }
@@ -163,6 +206,22 @@ namespace TournamentManager.Application.Features
             player.IsCaptain = updatePlayerRequest.IsCaptain;
             player.SteamId = updatePlayerRequest.SteamId;
 
+            await _playerRepository.UpdateAsync(player);
+
+            return Result.Success();
+        }
+
+        public async Task<Result> UpdatePlayerStatusAsync(Guid id, PlayerStatus playerStatus, CancellationToken cancellationToken = default)
+        {
+            var player = await _playerRepository.GetAsync(x => x.Id == id, cancellationToken: cancellationToken);
+
+            if (player is null)
+            {
+                return Result.Failure("Invalid Id");
+            }
+
+            player.Status = playerStatus;
+            
             await _playerRepository.UpdateAsync(player);
 
             return Result.Success();
