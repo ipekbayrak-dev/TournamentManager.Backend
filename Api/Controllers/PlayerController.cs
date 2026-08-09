@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TournamentManager.Application.Common;
@@ -64,6 +65,59 @@ namespace TournamentManager.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error during GetById for {Id}", id);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
+            }
+        }
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfileAsync()
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId is null) return Unauthorized();
+
+                var result = await _playerService.GetProfileAsync(userId);
+                if (!result.IsSuccess) return NotFound();
+
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during GetProfile");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
+            }
+        }
+
+        [HttpPost("profile")]
+        public async Task<IActionResult> CreateProfileAsync([FromBody] CreatePlayerRequest createPlayerRequest)
+        {
+
+
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                
+                if (userId is null)
+                {
+                    return Unauthorized();
+                }
+
+                var result = await _playerService.CreateProfileAsync(createPlayerRequest, userId);
+
+                if(!result.IsSuccess)
+                {
+                    return BadRequest(result.ErrorMessage);
+                }
+
+                return Ok(result.Data);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during Create for {FirstName}", createPlayerRequest.FirstName);
                 return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }

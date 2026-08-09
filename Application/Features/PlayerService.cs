@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using TournamentManager.Application.Common;
 using TournamentManager.Application.Dtos.Player;
 using TournamentManager.Application.Interfaces.Repositories;
@@ -11,10 +13,12 @@ namespace TournamentManager.Application.Features
     {
         private readonly IPlayerRepository _playerRepository;
         private readonly IValidator<CreatePlayerRequest> _createValidator;
-        public PlayerService(IPlayerRepository playerRepository, IValidator<CreatePlayerRequest> createValidator)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public PlayerService(IPlayerRepository playerRepository, IValidator<CreatePlayerRequest> createValidator, UserManager<ApplicationUser> userManager)
         {
             _playerRepository = playerRepository;
             _createValidator = createValidator;
+            _userManager = userManager;
         }
         private static PlayerResponse MapToResponse(Player player)
         {
@@ -76,6 +80,58 @@ namespace TournamentManager.Application.Features
             var response = player.Select(MapToResponse).ToList();
 
             return Result<ICollection<PlayerResponse>>.Success(response);
+        }
+        public async Task<Result<PlayerResponse>> GetProfileAsync(string userId, CancellationToken cancellationToken = default)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null)
+                return Result<PlayerResponse>.Failure("User not found");
+
+            if (user.PlayerId is null)
+                return Result<PlayerResponse>.Failure("No player profile found");
+
+            var player = await _playerRepository.GetAsync(x => x.Id == user.PlayerId, cancellationToken: cancellationToken);
+            if (player is null)
+                return Result<PlayerResponse>.Failure("No player profile found");
+
+            return Result<PlayerResponse>.Success(MapToResponse(player));
+        }
+
+        public async Task<Result<PlayerResponse>> CreateProfileAsync(CreatePlayerRequest createPlayerRequest, string userId, CancellationToken cancellationToken = default)
+        {
+            var validation = await _createValidator.ValidateAsync(createPlayerRequest, cancellationToken);
+
+            if (!validation.IsValid)
+            {
+                return Result<PlayerResponse>.Failure(validation.ToErrorMessage());
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user is null)
+            {
+                return Result<PlayerResponse>.Failure("User not found");
+            }
+
+            var player = new Player
+            {
+                Handle = createPlayerRequest.Handle,
+                FirstName = createPlayerRequest.FirstName,
+                LastName = createPlayerRequest.LastName,
+                CountryCode = createPlayerRequest.CountryCode,
+                Position = createPlayerRequest.Position,
+                IsCaptain = createPlayerRequest.IsCaptain,
+                SteamId = createPlayerRequest.SteamId,
+                TeamId = createPlayerRequest.TeamId
+            };
+
+            await _playerRepository.AddAsync(player);
+            
+            user.PlayerId = player.Id;
+            await _userManager.UpdateAsync(user);
+
+            return Result<PlayerResponse>.Success(MapToResponse(player));
+
         }
 
         public async Task<Result<PlayerResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
