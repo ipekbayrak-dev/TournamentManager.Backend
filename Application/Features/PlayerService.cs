@@ -159,6 +159,15 @@ namespace TournamentManager.Application.Features
             return Result<PlayerResponse>.Success(MapToResponse(player));
         }
 
+        public async Task<Result<ICollection<PlayerResponse>>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            var player = await _playerRepository.GetAllAsync(cancellationToken: cancellationToken);
+            
+            var response = player.Select(MapToResponse).ToList();
+            
+            return Result<ICollection<PlayerResponse>>.Success(response);
+        }
+
         public async Task<Result<PlayerResponse>> ResubmitProfileAsync(CreatePlayerRequest request, string userId, CancellationToken cancellationToken = default)
         {
             var user = await _userManager.FindByIdAsync(userId);

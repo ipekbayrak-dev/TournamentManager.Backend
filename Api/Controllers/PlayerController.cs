@@ -95,6 +95,27 @@ namespace TournamentManager.Api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
+        [HttpGet]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> GetAllAsync()
+        {
+            try
+            {
+                var result = await _playerService.GetAllAsync();
+                if (!result.IsSuccess) return NotFound();
+
+                return Ok(result.Data);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during GetAll");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
+            }
+        }
         [HttpGet("profile")]
         public async Task<IActionResult> GetProfileAsync()
         {
@@ -107,6 +128,10 @@ namespace TournamentManager.Api.Controllers
                 if (!result.IsSuccess) return NotFound();
 
                 return Ok(result.Data);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
@@ -160,6 +185,10 @@ namespace TournamentManager.Api.Controllers
                 if (!result.IsSuccess) return BadRequest(result.ErrorMessage);
 
                 return Ok(result.Data);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {

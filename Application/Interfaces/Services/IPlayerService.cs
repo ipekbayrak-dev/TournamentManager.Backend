@@ -7,6 +7,7 @@ namespace TournamentManager.Application.Interfaces.Services
     public interface IPlayerService
     {
         public Task<Result<PlayerResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        public Task<Result<ICollection<PlayerResponse>>> GetAllAsync(CancellationToken cancellationToken = default);
         public Task<Result<ICollection<PlayerResponse>>> GetAllByTeamIdAsync(Guid teamId, CancellationToken cancellationToken = default);
         public Task<Result<PlayerResponse>> GetProfileAsync(string userId, CancellationToken cancellationToken = default);
         public Task<Result<PlayerResponse>> CreateProfileAsync(CreatePlayerRequest createPlayerRequest, string userId, CancellationToken cancellationToken = default);
