@@ -125,6 +125,11 @@ namespace TournamentManager.Application.Features
                 return Result<PlayerResponse>.Failure("User not found");
             }
 
+            if (user.PlayerId is not null)
+            {
+                return Result<PlayerResponse>.Failure("A player profile already exists for this account.");
+            }
+
             var player = new Player
             {
                 Handle = createPlayerRequest.Handle,
