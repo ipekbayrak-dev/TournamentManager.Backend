@@ -5,6 +5,7 @@ namespace TournamentManager.Application.Interfaces.Services
 {
     public interface ITournamentService
     {
+        public Task<Result<TournamentResponse>> GetBySlugAsync(string slug, CancellationToken cancellationToken = default);
         public Task<Result<TournamentResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         public Task<Result<ICollection<TournamentResponse>>> GetAllAsync(CancellationToken cancellationToken = default);
         public Task<Result<TournamentResponse>> CreateAsync(CreateTournamentRequest createTournamentRequest, CancellationToken cancellationToken = default);

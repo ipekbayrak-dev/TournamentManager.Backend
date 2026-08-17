@@ -6,6 +6,7 @@ namespace TournamentManager.Domain.Entities
     public class Tournament : BaseEntity
     {
         public required string Name { get; set; }
+        public string? Slug { get; set; }
         public string? Description { get; set; }
         public string? Location { get; set; } = "Online";
         public DateTime StartDate { get; set; }

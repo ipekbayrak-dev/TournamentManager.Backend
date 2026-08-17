@@ -8,6 +8,7 @@ namespace TournamentManager.Application.Dtos.Tournament
     {
         public Guid Id { get; set; }
         public required string Name { get; set; }
+        public required string Slug { get; set; }
         public string? Description { get; set; }
         public string? Location { get; set; } 
         public DateTime StartDate { get; set; }

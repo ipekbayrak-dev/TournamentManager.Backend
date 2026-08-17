@@ -11,6 +11,11 @@ namespace TournamentManager.Infrastructure.Persistence.Configurations
             builder.Property(b => b.Name)
                 .HasMaxLength(63)
                 .IsRequired();
+            builder.Property(b => b.Slug)
+                .HasMaxLength(100);
+            builder.HasIndex(b => b.Slug)
+                .IsUnique()
+                .HasFilter("[Slug] IS NOT NULL");
             builder.Property(b => b.Description)
                 .HasMaxLength(255);
             builder.Property(b => b.Location)

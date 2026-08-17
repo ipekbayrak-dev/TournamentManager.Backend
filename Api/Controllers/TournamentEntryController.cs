@@ -67,7 +67,7 @@ namespace TournamentManager.Api.Controllers
             }
         }
         [HttpPost]
-        [Authorize(Roles = Roles.Admin)]
+        [Authorize]
         public async Task<IActionResult> CreateAsync([FromBody] CreateTournamentEntryRequest createTournamentEntryRequest)
         {
             try

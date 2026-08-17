@@ -25,6 +25,7 @@ namespace TournamentManager.Application.Features
             {
                 Id = tournament.Id,
                 Name = tournament.Name,
+                Slug = tournament.Slug,
                 Description = tournament.Description,
                 Location = tournament.Location,
                 StartDate = tournament.StartDate,
@@ -69,6 +70,7 @@ namespace TournamentManager.Application.Features
             var tournament = new Tournament
             {
                 Name = createTournamentRequest.Name,
+                Slug = createTournamentRequest.Slug.ToLowerInvariant(),
                 Description = createTournamentRequest.Description,
                 Location = createTournamentRequest.Location,
                 StartDate = createTournamentRequest.StartDate,
@@ -103,6 +105,16 @@ namespace TournamentManager.Application.Features
             return Result<ICollection<TournamentResponse>>.Success(response);
         }
 
+        public async Task<Result<TournamentResponse>> GetBySlugAsync(string slug, CancellationToken cancellationToken = default)
+        {
+            var tournament = await _tournamentRepository.GetAsync(x => x.Slug == slug, cancellationToken: cancellationToken);
+
+            if (tournament is null)
+                return Result<TournamentResponse>.Success(null);
+
+            return Result<TournamentResponse>.Success(MapToResponse(tournament));
+        }
+
         public async Task<Result<TournamentResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var tournament = await _tournamentRepository.GetAsync(x => x.Id == id, cancellationToken: cancellationToken);
@@ -125,6 +137,7 @@ namespace TournamentManager.Application.Features
             }
 
             tournament.Name = updateTournamentRequest.Name;
+            tournament.Slug = updateTournamentRequest.Slug.ToLowerInvariant();
             tournament.Description = updateTournamentRequest.Description;
             tournament.Location = updateTournamentRequest.Location;
             tournament.StartDate = updateTournamentRequest.StartDate;

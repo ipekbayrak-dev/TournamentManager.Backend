@@ -27,6 +27,16 @@ namespace TournamentManager.Application.Features
         }
         public async Task<Result<TournamentEntryResponse>> CreateAsync(CreateTournamentEntryRequest createTournamentEntryRequest, CancellationToken cancellationToken = default)
         {
+            var existing = await _tournamentEntryRepository.GetAsync(
+                x => x.TournamentId == createTournamentEntryRequest.TournamentId
+                && x.TeamId == createTournamentEntryRequest.TeamId
+            );
+
+            if (existing is not null)
+            {
+                return Result<TournamentEntryResponse>.Failure("This team is already registered for this tournament.");
+            }
+
             if (createTournamentEntryRequest.TournamentId == Guid.Empty)
             {
                 return Result<TournamentEntryResponse>.Failure("Invalid tournament ID.");
@@ -72,7 +82,7 @@ namespace TournamentManager.Application.Features
         public async Task<Result<TournamentEntryResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var tournamentEntry = await _tournamentEntryRepository.GetAsync(x => x.Id == id, cancellationToken: cancellationToken);
-            
+
             if (tournamentEntry is null)
             {
                 return Result<TournamentEntryResponse>.Success(null);

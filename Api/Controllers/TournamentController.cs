@@ -36,6 +36,28 @@ namespace TournamentManager.Api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
+        [HttpGet("slug/{slug}")]
+        public async Task<IActionResult> GetBySlug(string slug)
+        {
+            try
+            {
+                var result = await _tournamentService.GetBySlugAsync(slug);
+
+                if (!result.IsSuccess)
+                    return BadRequest(result.ErrorMessage);
+
+                if (result.Data is null)
+                    return NotFound();
+
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during GetBySlug for {Slug}", slug);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
