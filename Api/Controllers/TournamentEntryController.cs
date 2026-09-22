@@ -120,7 +120,7 @@ namespace TournamentManager.Api.Controllers
             }
         }
         [HttpDelete("{id}")]
-        [Authorize(Roles = Roles.Admin)]
+        [Authorize]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             try
