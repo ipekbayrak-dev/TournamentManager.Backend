@@ -120,6 +120,10 @@ namespace TournamentManager.Application.Features
                 return Result.Failure("Match not found.");
             }
 
+            bool firstCompletion = updateMatchRequest.Status == MatchStatus.Completed
+                                   && updateMatchRequest.WinnerTeamId.HasValue
+                                   && match.Status != MatchStatus.Completed;
+
             match.Status = updateMatchRequest.Status;
             match.TeamRadiantScore = updateMatchRequest.TeamRadiantScore;
             match.TeamDireScore = updateMatchRequest.TeamDireScore;
@@ -127,6 +131,39 @@ namespace TournamentManager.Application.Features
             match.WinnerTeamId = updateMatchRequest.WinnerTeamId;
 
             await _matchRepository.UpdateAsync(match);
+
+            if (firstCompletion)
+            {
+                var loserTeamId = match.WinnerTeamId == match.TeamRadiantId
+                    ? match.TeamDireId
+                    : match.TeamRadiantId;
+
+                if (match.WinnerAdvancesToMatchId.HasValue)
+                {
+                    var winnerNext = await _matchRepository.GetAsync(x => x.Id == match.WinnerAdvancesToMatchId.Value, cancellationToken: cancellationToken);
+                    if (winnerNext is not null)
+                    {
+                        if (winnerNext.TeamRadiantId is null)
+                            winnerNext.TeamRadiantId = match.WinnerTeamId;
+                        else if (winnerNext.TeamDireId is null)
+                            winnerNext.TeamDireId = match.WinnerTeamId;
+                        await _matchRepository.UpdateAsync(winnerNext);
+                    }
+                }
+
+                if (match.LoserAdvancesToMatchId.HasValue && loserTeamId.HasValue)
+                {
+                    var loserNext = await _matchRepository.GetAsync(x => x.Id == match.LoserAdvancesToMatchId.Value, cancellationToken: cancellationToken);
+                    if (loserNext is not null)
+                    {
+                        if (loserNext.TeamRadiantId is null)
+                            loserNext.TeamRadiantId = loserTeamId;
+                        else if (loserNext.TeamDireId is null)
+                            loserNext.TeamDireId = loserTeamId;
+                        await _matchRepository.UpdateAsync(loserNext);
+                    }
+                }
+            }
 
             return Result.Success();
         }
