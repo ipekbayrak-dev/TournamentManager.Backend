@@ -46,6 +46,7 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
+builder.Services.AddHostedService<TournamentManager.Api.BackgroundServices.TournamentStatusService>();
 builder.Services.AddValidatorsFromAssemblyContaining<SignUpRequestValidator>();
 builder.Services.AddOpenApi(options =>
 {
