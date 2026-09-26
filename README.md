@@ -1,12 +1,14 @@
 # TournamentManager — Backend
 
-A double-elimination tournament management system built as a graduation project. Modeled after the Dota 2 professional tournament format — supports full bracket progression, team registration, player management, prize pool allocation, and Stripe-ready payments.
+A double-elimination tournament management system built as a graduation project. Modeled after the Dota 2 professional tournament format — supports full bracket progression, team registration, player management, prize pool allocation, and Stripe payments.
 
 ## Features
 
 - **Double-elimination bracket** — upper bracket, lower bracket, grand final
 - **JWT authentication** with refresh tokens and role-based access (Admin, Captain, Player)
 - **Full CRUD** for Tournaments, Teams, Players, Matches, Prize Pools, Prize Allocations, Tournament Entries, and Payments
+- **Stripe Checkout** — entry fee payments via hosted Stripe Checkout sessions with webhook confirmation
+- **Automatic tournament status** — background service updates tournament status every hour based on start/end dates
 - **Soft delete** via global EF Core query filters — nothing is permanently removed
 - **FluentValidation** on all critical create endpoints
 - **Scalar UI** for interactive API documentation
@@ -21,6 +23,7 @@ A double-elimination tournament management system built as a graduation project.
 | Database | SQL Server |
 | Auth | ASP.NET Core Identity + JWT |
 | Validation | FluentValidation |
+| Payments | Stripe.net v47 |
 | API Docs | Scalar (OpenAPI 3.1) |
 | Architecture | 4-layer (Domain / Application / Infrastructure / Api) |
 
@@ -51,7 +54,8 @@ TournamentManager.Backend/
 │   └── Services/          # TokenService, infrastructure service implementations
 │
 └── Api/
-    ├── Controllers/       # AuthController + 8 CRUD controllers
+    ├── BackgroundServices/# TournamentStatusService (hourly status auto-update)
+    ├── Controllers/       # AuthController + 9 CRUD controllers
     ├── DbSeeder.cs        # Seeds roles and default admin on startup
     ├── BearerSecuritySchemeTransformer.cs
     └── Program.cs
@@ -62,29 +66,30 @@ TournamentManager.Backend/
 - **Result\<T\> pattern** — all services return `Result<T>` or `Result`. Controllers check `IsSuccess`, then `Data is null` for 404, then return 200.
 - **ApplyIncludes hook** — `EFRepositoryBase<T>` exposes `protected virtual IQueryable<T> ApplyIncludes(IQueryable<T>)`. Repositories that need eager loading (Team → Players, Prize → Allocations, Tournament → Matches + Entries) override this single method.
 - **Soft delete** — `DeletedAt` timestamp on `BaseEntity`, filtered globally via `HasQueryFilter`. Pass `withDeleted: true` to bypass.
-- **Roles** — `Admin` can write everything. `Player` can read and register. `Captain` reserved for future team management features.
+- **Roles** — `Admin` can write everything. `Player`/`Captain` can read, register for tournaments, and manage their own entries.
 
 ## API Endpoints
 
 | Group | Endpoints |
 |---|---|
 | Auth | POST /register, POST /login, POST /refresh |
-| Tournament | GET all, GET by id, POST, PUT, DELETE |
-| Team | GET all, GET by id, POST, PUT, DELETE |
-| Player | GET by team, GET by id, POST, PUT, DELETE |
-| Match | GET by tournament, GET by id, POST, PUT, DELETE |
-| TournamentEntry | GET by tournament, GET by id, POST, PUT, DELETE |
-| Prize | GET by tournament, GET by id, POST, PUT, DELETE |
-| PrizeAllocation | GET by id, POST, PUT, DELETE |
-| Payment | GET by id, POST, PUT, DELETE |
+| Tournament | GET all, GET by id, POST, PUT, DELETE (Admin) |
+| Team | GET all, GET by id, POST, PUT, DELETE (Admin) |
+| Player | GET by team, GET by id, POST, PUT, DELETE (Admin) |
+| Match | GET by tournament, GET by id, POST, PUT, DELETE (Admin) |
+| TournamentEntry | GET by tournament, GET by id, POST, DELETE (authenticated), PUT (Admin) |
+| Prize | GET by tournament, GET by id, POST, PUT, DELETE (Admin) |
+| PrizeAllocation | GET by id, POST, PUT, DELETE (Admin) |
+| Payment | POST /create-checkout-session, POST /webhook, GET/PUT/DELETE (Admin) |
 
-All endpoints except Auth require a valid JWT Bearer token. Write operations (POST/PUT/DELETE) require the `Admin` role.
+All endpoints except Auth require a valid JWT Bearer token.
 
 ## Prerequisites
 
 - .NET 10 SDK
 - SQL Server
 - EF Core tools: `dotnet tool install --global dotnet-ef`
+- Stripe CLI (for local webhook forwarding): `winget install Stripe.StripeCLI`
 
 ## Getting Started
 
@@ -95,24 +100,39 @@ All endpoints except Auth require a valid JWT Bearer token. Write operations (PO
 }
 ```
 
-**2. Apply migrations** from the solution root:
+**2. Create `Api/appsettings.Development.json`** with your real secrets (this file is git-ignored):
+```json
+{
+  "Jwt": { "Secret": "your-jwt-secret-here" },
+  "Stripe": {
+    "SecretKey": "sk_test_...",
+    "PublishableKey": "pk_test_...",
+    "WebhookSecret": "whsec_..."
+  }
+}
 ```
-dotnet ef migrations add InitialCreate --project TournamentManager.Backend/Infrastructure --startup-project TournamentManager.Backend/Api
 
+**3. Apply migrations** from the solution root:
+```
 dotnet ef database update --project TournamentManager.Backend/Infrastructure --startup-project TournamentManager.Backend/Api
 ```
 
-**3. Run the API:**
+**4. Run the API:**
 ```
 dotnet run --project TournamentManager.Backend/Api
 ```
 
-**4. Open Scalar UI:**
+**5. Forward Stripe webhooks** (separate terminal, required for payment confirmation):
 ```
-http://localhost:5147/scalar/v1
+stripe listen --forward-to https://localhost:7008/api/Payment/webhook
 ```
 
-The default admin account (`hello@ipekbayrak.dev`) and all roles are seeded automatically on first run.
+**6. Open Scalar UI:**
+```
+https://localhost:7008/scalar/v1
+```
+
+The default admin account and all roles are seeded automatically on first run.
 
 ## Default Credentials
 
