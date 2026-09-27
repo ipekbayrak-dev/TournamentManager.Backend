@@ -9,7 +9,7 @@ namespace TournamentManager.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class TournamentController(ITournamentService _tournamentService, ILogger<TournamentController> _logger) : ControllerBase
+    public class TournamentController(ITournamentService _tournamentService, IBracketService _bracketService, ILogger<TournamentController> _logger) : ControllerBase
     {
         [HttpGet]
         public async Task<IActionResult> GetAllAsync()
@@ -164,6 +164,26 @@ namespace TournamentManager.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error during Delete for {Id}", id);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
+            }
+        }
+
+        [HttpPost("{id}/generate-bracket")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> GenerateBracketAsync(Guid id)
+        {
+            try
+            {
+                var result = await _bracketService.GenerateBracketAsync(id);
+
+                if (!result.IsSuccess)
+                    return BadRequest(result.ErrorMessage);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during GenerateBracket for {Id}", id);
                 return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }

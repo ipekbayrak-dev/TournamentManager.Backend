@@ -9,6 +9,7 @@ namespace TournamentManager.Application
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IBracketService, BracketService>();
             services.AddScoped<IMatchService, MatchService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IPlayerService, PlayerService>();
