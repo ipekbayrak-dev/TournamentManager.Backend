@@ -73,7 +73,7 @@ public class BracketServiceTests
     [Fact]
     public async Task GenerateBracketAsync_ReturnsFailure_WhenBracketAlreadyExists()
     {
-        SetupTournament(new Tournament { Id = Guid.NewGuid(), StartDate = DateTime.UtcNow });
+        SetupTournament(new Tournament { Id = Guid.NewGuid(), Name = "Test", StartDate = DateTime.UtcNow });
         SetupMatches(new List<Match> { new() });
 
         var result = await _sut.GenerateBracketAsync(Guid.NewGuid());
@@ -86,7 +86,7 @@ public class BracketServiceTests
     [Fact]
     public async Task GenerateBracketAsync_ReturnsFailure_WhenFewerThanEightApprovedEntries()
     {
-        SetupTournament(new Tournament { Id = Guid.NewGuid(), StartDate = DateTime.UtcNow });
+        SetupTournament(new Tournament { Id = Guid.NewGuid(), Name = "Test", StartDate = DateTime.UtcNow });
         SetupMatches(new List<Match>());
         SetupEntries(MakeEntries(7));
 
@@ -100,7 +100,7 @@ public class BracketServiceTests
     [Fact]
     public async Task GenerateBracketAsync_ReturnsSuccess_AndCreates14Matches_WhenEightApprovedEntries()
     {
-        SetupTournament(new Tournament { Id = Guid.NewGuid(), StartDate = DateTime.UtcNow });
+        SetupTournament(new Tournament { Id = Guid.NewGuid(), Name = "Test", StartDate = DateTime.UtcNow });
         SetupMatches(new List<Match>());
         SetupEntries(MakeEntries(8));
         _matchRepo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<Match>>()))
